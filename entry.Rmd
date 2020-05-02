@@ -1,0 +1,205 @@
+---
+title: "EDA"
+author: "Jakub Wiśniewski, Hanna Zdulska"
+date: "5/2/2020"
+output: html_document
+---
+
+
+# A study of Asian Religious and Biblical Texts
+
+In this dataset there is following books:    
+* Upanishads  -  are ancient Sanskrit texts of spiritual teaching and ideas of Hinduism. They are the part of the oldest scriptures of Hinduism, the Vedas, that deal with meditation, philosophy, and spiritual knowledge; other parts of the Vedas deal with mantras, benedictions, rituals, ceremonies, and sacrifices.   
+
+* Yoga Sutras -  collection of 196 Sanskrit sutras* (aphorisms) on the theory and practice of yoga. 
+
+* Buddha Sutras - were initially passed on orally by monks, but were later written down and composed as manuscripts in various Indo-Aryan languages which were then translated into other local languages as Buddhism spread
+
+* Tao Te Ching -  fundamental text for both philosophical and religious Taoism. It also strongly influenced other schools of Chinese philosophy and religion, including Legalism, Confucianism, and Buddhism, which was largely interpreted through the use of Taoist words and concepts when it was originally introduced to China.
+
+Old Testament : 
+
+ - Book of Wisdom - Solomon's speech concerning wisdom, wealth, power and prayer
+ 
+ - Book of Proverbs - Proverbs is not merely an anthology but a "collection of collections" relating to a pattern of life which lasted for more than a millennium. It is an example of the Biblical wisdom tradition, and raises questions of values, moral behaviour, the meaning of human life, and right conduct.
+ 
+ - Book of Ecclesiastes - is one of 24 books of the Tanakh (Hebrew Bible), where it is classified as one of the Ketuvim (Writings).
+ 
+ - Book of Ecclesiasticus -  commonly called the Wisdom of Sirach or simply Sirach. 
+ 
+ More on [wikipedia](https://en.wikipedia.org/wiki/Main_Page)
+
+**in Indian literary traditions refers to an aphorism or a collection of aphorisms in the form of a manual or, more broadly, a condensed manual or text. Sutras are a genre of ancient and medieval Indian texts found in Hinduism, Buddhism and Jainism.*
+
+
+## EDA
+
+### Looking at data
+
+```{r, include=FALSE}
+library(dplyr)
+library(ggplot2)
+library(stringi)
+library(knitr)
+library(kableExtra)
+library(wordcloud)
+library(RColorBrewer)
+
+# Fixed path left for Hania to get mad (but dont plz) coz data is big big 
+path <- "~/Downloads/AsianReligionsData/AllBooks_baseline_DTM_Labelled.csv"
+data <- read.csv(path)
+
+```
+
+```{r}
+knitr::kable(
+  data[1:10, 1:10], caption = 'Dataset',
+  booktabs = TRUE
+) %>% 
+  kable_styling()
+
+```
+
+Looking at data we are certain that there is no sense in keeping chapters separated. We than used `stringi` package to extract names of books. We figured that we combine biblical texts into one as they have significantly less chapters than the rest. Than we truncated it to have only one book per row (word occurances were summed). We ended up with this dataframe:
+
+
+```{r}
+
+
+book_name <- stri_extract(data$X, regex =  "^[a-zA-Z]+")
+book_name <- ifelse(startsWith(book_name, "Bo"), "Bible",book_name)
+data$book_name <- book_name
+data <- data[,-1]
+book_names <- unique(data$book_name)
+
+df <- matrix(0, length(book_names), ncol = ncol(data)-1)
+for (i in seq_along(book_names)){
+  row <- colSums(data[data$book_name == book_names[i],1:(ncol(data)-1)])
+  df[i,] <- row
+}
+
+df <- as.data.frame(df)
+
+df <- cbind(book_names,df)
+colnames(df) <- c( "book_name", colnames(data[,1:(ncol(data)-1)]))
+m <- ncol(df)
+
+knitr::kable(
+  df[1:5, 1:10], caption = 'Dataset',
+  booktabs = TRUE
+) %>% 
+  kable_styling()
+
+```
+It is already better for visualization. 
+
+## Visualization
+
+Most common words per book
+
+```{r}
+for (bn in book_names){
+tmp <- sort(df[df$book_name == bn, 2:m], decreasing = T)
+barplot(height = unlist(tmp[10:1]),
+        las =2 ,
+        horiz = TRUE,
+        main = paste("Most frequent words in", bn),
+        cex.names=0.7,
+        col = "lightblue")
+}
+```
+
+More interesting way to visualize words is word clouds
+
+TeoTeChing
+
+```{r}
+bn <- "TaoTeChing"
+tmp <- unlist(df[df$book_name == bn, -1])
+names(tmp) <- NULL
+df2 <- data.frame(word = colnames(df[,-1]), freq  = tmp)
+
+set.seed(1234)
+wordcloud(words = df2$word, freq = df2$freq, min.freq = 1,
+          max.words=100, random.order=FALSE, rot.per=0.35, 
+          colors=brewer.pal(8, "Dark2"), main = bn)
+
+
+```
+
+Bible
+
+```{r}
+bn <-  "Bible" 
+tmp <- unlist(df[df$book_name == bn, -1])
+names(tmp) <- NULL
+df2 <- data.frame(word = colnames(df[,-1]), freq  = tmp)
+
+set.seed(1234)
+wordcloud(words = df2$word, freq = df2$freq, min.freq = 1,
+          max.words=100, random.order=FALSE, rot.per=0.35, 
+          colors=brewer.pal(8, "Dark2"), main = bn)
+```
+
+Buddhism
+ 
+```{r}
+bn <-  "Buddhism" 
+tmp <- unlist(df[df$book_name == bn, -1])
+names(tmp) <- NULL
+df2 <- data.frame(word = colnames(df[,-1]), freq  = tmp)
+
+set.seed(1234)
+wordcloud(words = df2$word, freq = df2$freq, min.freq = 1,
+          max.words=50, random.order=FALSE, rot.per=0.35, 
+          colors=brewer.pal(8, "Dark2"), main = bn)
+
+```
+
+Upnishad
+
+```{r}
+bn <-  "Upanishad"
+tmp <- unlist(df[df$book_name == bn, -1])
+names(tmp) <- NULL
+df2 <- data.frame(word = colnames(df[,-1]), freq  = tmp)
+
+set.seed(1234)
+wordcloud(words = df2$word, freq = df2$freq, min.freq = 1,
+          max.words=80, random.order=FALSE, rot.per=0.35, 
+          colors=brewer.pal(8, "Dark2"), main = bn)
+
+```
+
+YogaSutra
+
+```{r}
+bn <-  "YogaSutra" 
+tmp <- unlist(df[df$book_name == bn, -1])
+names(tmp) <- NULL
+df2 <- data.frame(word = colnames(df[,-1]), freq  = tmp)
+
+set.seed(1234)
+wordcloud(words = df2$word, freq = df2$freq, min.freq = 1,
+          max.words=100, random.order=FALSE, rot.per=0.35, 
+          colors=brewer.pal(8, "Dark2"), main = bn)
+
+```
+
+
+```{r}
+library(Rtsne)
+library(ggplot2)
+
+tsne <- Rtsne(data[,1:8266], dims = 2, preplexity = 30,  verbose=TRUE, max_iter = 500)
+data_to_plot <- as.data.frame(tsne$Y)
+
+data_to_plot$label <- book_name
+
+ggplot(data_to_plot, aes(x = V1, y = V2, color = label)) +
+  geom_point() + 
+  theme_bw() + 
+  scale_color_manual(values = brewer.pal(8, "Set1"))
+
+```
+
