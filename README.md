@@ -1,2 +1,4 @@
 # sacred_texts
-Na rany Chrystusa, Biblię rozpoznam!
+Może na chińskich bajkach się nie znam, ale biblię rozpoznam z zamkniętymi oczami, na rany Chrystusa!
+
+
