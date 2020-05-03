@@ -37,6 +37,7 @@ Old Testament :
 ### Looking at data
 
 ```{r, include=FALSE}
+knitr::opts_chunk$set(cache = TRUE)
 library(dplyr)
 library(ggplot2)
 library(stringi)
