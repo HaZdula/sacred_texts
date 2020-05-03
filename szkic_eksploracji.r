@@ -147,6 +147,8 @@ melted <- reshape::melt(wtf)
 rpivotTable(data = melted, cols = "sent", rows = "variable", rendererName = "Heatmap", aggregatorName = "Sum", vals = "value")
 
 
+###TU KUBA POPATRZ PLZ
+
 dlugosci_slow <- parallelLapply(inside, function(x){sapply(x, nchar, simplify = TRUE, USE.NAMES = FALSE)})
 
 names(dlugosci_slow) <- booknames
