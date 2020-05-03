@@ -283,15 +283,14 @@ books <- stri_extract(df$X, regex =  "^[a-zA-Z]+")
 df$X <- books
 
 starttime <- Sys.time()
-inside <- parallelLapply(books, get_words_in_books, df=df)
+inside <- parallelLapply(unique(books), get_words_in_books, df=df)
 endtime <- Sys.time()
 endtime - starttime
 
 
 ```
 
-```{r}
-
+```{r message=FALSE, warning=FALSE}
 select_sentiment <- function(word, sent_name){
   #' fukncja zwraca liste posortowanych slow o danym sentymencie
   #' @param word lista slow do analizy
@@ -368,13 +367,15 @@ sentiment_table_mixed <- function(word, name, sent = c("trust",
   return(tab)
 }
 
+booknames <- unique(books)
+names(inside) <- booknames
 
 df_sented_list <- parallelLapply(booknames, function(x, inside){sentiment_table_mixed(unlist(inside[x]), x)}, inside = inside)
 
-df_sented <- do.call("cbind",l)
+df_sented <- do.call("cbind",df_sented_list)
 
 
-df_sented <- cbind(wtf, sent= c("trust", 
+df_sented <- cbind(df_sented, sent= c("trust", 
                      "fear", 
                      "negative", 
                      "sadness",
@@ -387,10 +388,12 @@ df_sented <- cbind(wtf, sent= c("trust",
 
 
 melted <- reshape::melt(df_sented)
-
-rpivotTable(data = melted, cols = "sent", rows = "variable", rendererName = "Heatmap", aggregatorName = "Sum", vals = "value")
-
 ```
+
+```{r}
+rpivotTable(data = melted, cols = "sent", rows = "variable", rendererName = "Heatmap", aggregatorName = "Sum", vals = "value")
+```
+
 
 Let's see with books of Bible treated as one:
 
