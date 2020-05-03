@@ -46,7 +46,7 @@ library(wordcloud)
 library(RColorBrewer)
 
 # Fixed path left for Hania to get mad (but dont plz) coz data is big big 
-path <- "~/Downloads/AsianReligionsData/AllBooks_baseline_DTM_Labelled.csv"
+path <- "AllBooks_baseline_DTM_Labelled.csv"
 data <- read.csv(path)
 
 ```
@@ -187,9 +187,12 @@ wordcloud(words = df2$word, freq = df2$freq, min.freq = 1,
 ```
 
 
+How our chapters look categorized in books look treated with TSNE
+
 ```{r}
 library(Rtsne)
 library(ggplot2)
+library(plotly)
 
 tsne <- Rtsne(data[,1:8266], dims = 2, preplexity = 30,  verbose=TRUE, max_iter = 500)
 data_to_plot <- as.data.frame(tsne$Y)
@@ -202,4 +205,49 @@ ggplot(data_to_plot, aes(x = V1, y = V2, color = label)) +
   scale_color_manual(values = brewer.pal(8, "Set1"))
 
 ```
+
+And how they look in 3d
+```{r}
+tsne <- Rtsne(data[,1:8266], dims = 3, preplexity = 30,  verbose=TRUE, max_iter = 500)
+data_to_plot <- as.data.frame(tsne$Y)
+
+data_to_plot$label <- book_name
+
+plot_ly(data_to_plot, x = ~V1, y = ~V2, z = ~V3, color = ~label, size = 0.1)
+```
+
+word lengths
+```{r}
+d <- data.frame(word_len = NULL, book = NULL)
+
+for (bn in book_names){
+tmp_df <- df[df$book_name == bn,]
+word_list <- sapply(colnames(tmp_df)[2:ncol(tmp_df)], function(x) rep(nchar(x), tmp_df[x])  )
+word_list <- unlist(word_list) 
+names(word_list) <- NULL
+p <- data.frame(word_len = word_list, book = rep(bn, length(word_list)))
+d <- rbind(d, p)
+
+}
+
+ggplot(d, aes(x = word_len, fill = book)) + geom_density(adjust = 2, alpha = 0.5 ) + theme_minimal()
+```
+
+```{r}
+ggplot(d, aes(y = word_len, x= book,  fill = book)) + geom_boxplot() + theme_minimal()
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
