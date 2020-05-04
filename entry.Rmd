@@ -265,13 +265,15 @@ d <- data[,long] %>% colSums() %>% as.data.frame()
 d$names <- rownames(d)
 colnames(d)[1] <- "occurrances"
 
-d %>% arrange(desc(occurrances))
+d %>% arrange(desc(occurrances)) %>%  head(10) %>% kable()
 
 ```
 
-*At Savatthi. There the Blessed One said, "Monks, there are these five **clinging-aggregates**. Which five? Form as a clinging-aggregate, feeling as a clinging-aggregate, perception as a clinging-aggregate, fabrications as a clinging-aggregate, consciousness as an a clinging-aggregate.*
+    *"These are the five clinging-aggregates: form as a clinging-aggregate, feeling as a clinging-aggregate, perception as a clinging-aggregate, fabrications as a clinging-aggregate, consciousness as a clinging-aggregate... These five clinging-aggregates are rooted in desire..."The Buddha:A certain monk: "Is it the case that clinging and the five clinging-aggregates are the same thing, or are they separate?"A certain monk:The Buddha: "Clinging is neither the same thing as the five clinging-aggregates, nor are they separate. Whatever desire & passion there is with regard to the five clinging-aggregates, that is the clinging there..."*
 
+    *"There are three kinds of feeling: pleasant feeling, painful feeling, & neither-pleasant-nor-painful feeling... Whatever is experienced physically or mentally as pleasant & gratifying is pleasant feeling. Whatever is experienced physically or mentally as painful & hurting is painful feeling. Whatever is experienced physically or mentally as neither gratifying nor hurting is neither-pleasant-nor-painful feeling... Pleasant feeling is pleasant in remaining and painful in changing. Painful feeling is painful in remaining and pleasant in changing. Neither-pleasant-nor-painful feeling is pleasant when conjoined with knowledge and painful when devoid of knowledge."*
 
+--Bhuddhism
 
 ## Sentiment
 
