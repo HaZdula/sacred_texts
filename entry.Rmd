@@ -261,9 +261,15 @@ long <- parallelLapply(w, function(x){if(nchar(x)>15){x}else NULL})
 long <- unlist(long)
 long
 
-data[,long] %>% colSums() %>% as.data.frame()
+d <- data[,long] %>% colSums() %>% as.data.frame() 
+d$names <- rownames(d)
+colnames(d)[1] <- "occurrances"
+
+d %>% arrange(desc(occurrances))
 
 ```
+
+*At Savatthi. There the Blessed One said, "Monks, there are these five **clinging-aggregates**. Which five? Form as a clinging-aggregate, feeling as a clinging-aggregate, perception as a clinging-aggregate, fabrications as a clinging-aggregate, consciousness as an a clinging-aggregate.*
 
 
 
