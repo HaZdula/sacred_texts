@@ -2,9 +2,13 @@
 title: "EDA"
 author: "Jakub Wiśniewski, Hanna Zdulska"
 date: "5/2/2020"
-output: html_document
+output:
+  html_document:
+    df_print: paged
+    toc: true
+    toc_float: true
+    number_sections: true
 ---
-
 
 # A study of Asian Religious and Biblical Texts
 
@@ -110,6 +114,8 @@ It is already better for visualization.
 
 ## Visualization
 
+### Most common words
+
 Most common words per book
 
 ```{r}
@@ -123,6 +129,8 @@ barplot(height = unlist(tmp[10:1]),
         col = "lightblue")
 }
 ```
+
+### Word coluds
 
 More interesting way to visualize words is word clouds
 
@@ -201,6 +209,7 @@ wordcloud(words = df2$word, freq = df2$freq, min.freq = 1,
 
 ```
 
+### Dimentionality reduction
 
 How our chapters look categorized in books look treated with TSNE
 
@@ -209,7 +218,7 @@ library(Rtsne)
 library(ggplot2)
 library(plotly)
 
-tsne <- Rtsne(data[,1:8266], dims = 2, preplexity = 30,  verbose=TRUE, max_iter = 500)
+tsne <- Rtsne(data[,1:8266], dims = 2, preplexity = 30,  verbose=FALSE, max_iter = 500)
 data_to_plot <- as.data.frame(tsne$Y)
 
 data_to_plot$label <- book_name
@@ -223,13 +232,15 @@ ggplot(data_to_plot, aes(x = V1, y = V2, color = label)) +
 
 And how they look in 3d
 ```{r}
-tsne <- Rtsne(data[,1:8266], dims = 3, preplexity = 30,  verbose=TRUE, max_iter = 500)
+tsne <- Rtsne(data[,1:8266], dims = 3, preplexity = 30,  verbose=FALSE, max_iter = 500)
 data_to_plot <- as.data.frame(tsne$Y)
 
 data_to_plot$label <- book_name
 
 plot_ly(data_to_plot, x = ~V1, y = ~V2, z = ~V3, color = ~label, size = 0.1)
 ```
+
+### Word lengths
 
 word lengths
 ```{r}
@@ -252,20 +263,20 @@ ggplot(d, aes(x = word_len, fill = book)) + geom_density(adjust = 2, alpha = 0.5
 ggplot(d, aes(y = word_len, x= book,  fill = book)) + geom_boxplot() + theme_minimal()
 ```
 
-#Abnormally long words
+### Abnormally long words
 
 ```{r}
 w <- colnames(data)
 
 long <- parallelLapply(w, function(x){if(nchar(x)>15){x}else NULL})
 long <- unlist(long)
-long
 
 d <- data[,long] %>% colSums() %>% as.data.frame() 
 d$names <- rownames(d)
 colnames(d)[1] <- "occurrances"
 
-d %>% arrange(desc(occurrances)) %>%  head(10) %>% kable()
+d %>% arrange(desc(occurrances)) %>%  head(10) %>% kable() %>% 
+  kable_styling()
 
 ```
 
@@ -275,7 +286,9 @@ d %>% arrange(desc(occurrances)) %>%  head(10) %>% kable()
 
 --Bhuddhism
 
-## Sentiment
+## Sentiment analysis
+
+###  Sentiment
 
 The NRC Emotion Lexicon is a list of English words and their associations with eight basic emotions (anger, fear, anticipation, trust, surprise, sadness, joy, and disgust) and two sentiments (negative and positive). The annotations were manually done by crowdsourcing.
 
@@ -312,7 +325,7 @@ endtime - starttime
 
 ```
 
-```{r message=FALSE, warning=FALSE}
+```{r message=FALSE, warning=FALSE, echo=FALSE, message = FALSE}
 select_sentiment <- function(word, sent_name){
   #' fukncja zwraca liste posortowanych slow o danym sentymencie
   #' @param word lista slow do analizy
