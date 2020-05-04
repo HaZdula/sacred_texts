@@ -252,6 +252,20 @@ ggplot(d, aes(x = word_len, fill = book)) + geom_density(adjust = 2, alpha = 0.5
 ggplot(d, aes(y = word_len, x= book,  fill = book)) + geom_boxplot() + theme_minimal()
 ```
 
+#Abnormally long words
+
+```{r}
+w <- colnames(data)
+
+long <- parallelLapply(w, function(x){if(nchar(x)>15){x}else NULL})
+long <- unlist(long)
+long
+
+data[,long] %>% colSums() %>% as.data.frame()
+
+```
+
+
 
 ## Sentiment
 
@@ -416,8 +430,6 @@ melted <- reshape::melt(df_sented_simp)
 rpivotTable(data = melted, cols = "sent", rows = "variable", rendererName = "Heatmap", aggregatorName = "Sum", vals = "value")
 
 ```
-
-
 
 
 
