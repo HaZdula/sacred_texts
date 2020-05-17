@@ -28,3 +28,22 @@ def get_nice_text(filename = "Complete_text2.txt"):
     
     
     return data
+
+
+def get_labels(merge_Bible = True):
+    
+    if merge_Bible:
+        return(['Buddhism'] * 46 +\
+            ['TaoTeChing'] * 81 +\
+            ['Upanishad'] * 162 + \
+            ['YogaSutra'] * 189 + \
+            ['Bible'] * (31+12+50+19) )
+    else:
+        return(['Buddhism'] * 46 +\
+            ['TaoTeChing'] * 81 +\
+            ['Upanishad'] * 162 + \
+            ['YogaSutra'] * 189 + \
+            ['BookOfProverb'] * 31 +\
+            ['BookOfEcclesiastes'] * 12 + \
+            ['BookOfEccleasiasticus'] * 50 +\
+            ['BookOfWisdom'] * 19)
